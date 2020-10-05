@@ -1,1 +1,2 @@
+freezegun      == 1.0.0
 pytest         == 6.1.1
