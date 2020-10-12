@@ -1,6 +1,7 @@
 appdirs          == 1.4.4
 cryptography     == 3.1.1
 keyring          == 21.4.0
+kivy             == 2.0.0rc3
 opencv-python    == 4.4.0.44
 pillow           == 7.2.0
 pyotp            == 2.4.0

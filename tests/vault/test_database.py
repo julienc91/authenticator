@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from authenticator.vault import SessionMaker
-from authenticator.vault.database import OTP
+from authenticator.vault.models import OTP
 
 
 def test_OTP(monkeypatch):

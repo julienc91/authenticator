@@ -5,7 +5,10 @@ from authenticator import qr_code
 
 def test_read():
     res = qr_code.read("tests/data/qrcode.png")
-    assert res == "otpauth://totp/test%40authenticator?secret=ThisIsTheSecretKey&issuer=authenticator"
+    assert (
+        res
+        == "otpauth://totp/test%40authenticator?secret=ThisIsTheSecretKey&issuer=authenticator"
+    )
 
 
 def test_write(tmpdir):
