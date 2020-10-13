@@ -5,7 +5,7 @@ import os.path
 
 import appdirs
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from .database import Base
 from .models import OTP
@@ -26,14 +26,16 @@ def create_db():
     return engine
 
 
-class SessionMaker:
+class SessionMakerBuilder:
     _instance = None
 
     @classmethod
-    def get(cls):
+    def __call__(cls, *args, **kwargs) -> Session:
         if not cls._instance:
             cls._instance = sessionmaker(bind=create_db())
         return cls._instance()
 
+
+SessionMaker = SessionMakerBuilder()
 
 __all__ = [OTP, SessionMaker]

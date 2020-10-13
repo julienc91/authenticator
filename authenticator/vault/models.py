@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 from enum import Enum
 from urllib.parse import parse_qsl, ParseResult, unquote, urlparse
 
@@ -55,6 +56,12 @@ class OTP(Base):
             secret, label, initial_count, issuer, algorithm.value, digits, interval
         )
 
+    def __repr__(self):
+        return f"<OTP {self.id} - {self.issuer}:{self.label}>"
+
+    def __str__(self):
+        return f"<OTP {self.issuer}:{self.label}>"
+
     @property
     def _parsed_uri(self) -> ParseResult:
         return urlparse(self.uri)
@@ -105,3 +112,8 @@ class OTP(Base):
 
     def generate(self) -> str:
         return self._builder.now()
+
+    def get_next_change_timeout(self) -> float:
+        timestamp = time.time()
+        interval = self.interval
+        return interval - (timestamp % interval)

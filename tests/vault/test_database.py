@@ -6,7 +6,7 @@ from authenticator.vault.models import OTP
 
 def test_OTP(monkeypatch):
     uri = "otpauth://totp/test%40authenticator?secret=ThisIsTheSecretKey&issuer=authenticator"
-    session = SessionMaker.get()
+    session = SessionMaker()
     created_instance = OTP(uri=uri)
 
     session.add(created_instance)
@@ -19,7 +19,7 @@ def test_OTP(monkeypatch):
 
     monkeypatch.setattr("authenticator.vault.encryption.key_manager._key", "bad_key")
 
-    session = SessionMaker.get()
+    session = SessionMaker()
     assert session.query(OTP).count() == 1
     read_instance = session.query(OTP).filter(OTP.uri == uri).first()
     assert not read_instance
