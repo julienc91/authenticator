@@ -17,5 +17,13 @@ def delete_otp(otp: OTP, session: Session) -> None:
     session.delete(otp)
 
 
-def get_all_otp(session: Session) -> List[OTP]:
-    return session.query(OTP).all()
+def get_all_otp(session: Session, search: str = None) -> List[OTP]:
+    otps = session.query(OTP).all()
+    if search:
+        search = search.lower()
+        otps = [
+            otp
+            for otp in otps
+            if search in otp.issuer.lower() or search in otp.label.lower()
+        ]
+    return otps

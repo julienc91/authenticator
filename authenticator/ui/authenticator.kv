@@ -1,0 +1,83 @@
+<OTPProgressBar@ProgressBar>:
+    value: root.parent.parent.progress
+    canvas:
+        Clear
+        Color:
+            rgb: 0.26, 0.26, 0.26
+        Rectangle:
+            pos: self.pos[0], self.pos[1] + 1 + root.parent.size[1] / 2 - self.size[1] / 2
+            size: self.size[0], self.size[1] - 2
+        Color:
+            rgb: 0.13, 0.80, 0.93
+        Rectangle:
+            pos: self.pos[0], self.pos[1] + root.parent.size[1] / 2 - self.size[1] / 2
+            size: self.size[0] * self.value_normalized, self.size[1]
+
+<OTPWidget@BoxLayout>:
+    orientation: 'vertical'
+
+    Label:
+        halign: 'left'
+        size: self.texture_size
+        size_hint: None, None
+        text: root.id_label
+
+    BoxLayout:
+        orientation: 'horizontal'
+        spacing: 10
+
+        OTPProgressBar:
+            height: 8
+            width: 40
+            size_hint: None, None
+
+        Label:
+            font_name: 'RobotoMono-Regular'
+            font_size: 30
+            halign: 'left'
+            size: self.texture_size
+            size_hint: None, None
+            text: root.code_label
+
+<OTPList>:
+    viewclass: 'OTPWidget'
+    RecycleBoxLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        height: self.minimum_height
+        padding: 20
+        size_hint_y: None
+        spacing: 30
+        orientation: 'vertical'
+
+<OTPFilter@BoxLayout>:
+    orientation: 'horizontal'
+    height: 70
+    padding: 20
+    size_hint: 1, None
+    Image:
+        pos_hint: {'left':1, 'top':1}
+        size_hint: None, None
+        size: 30, 30
+        source: 'authenticator/ui/assets/search.png'
+    TextInput:
+        cursor_color: 0, 0, 0, 1
+        height: 30
+        multiline: False
+        on_text: root.parent.parent.ids.otplist.set_search_text(self.text)
+        text: ''
+
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        OTPFilter
+        OTPList:
+            id: otplist
+
+ScreenManager:
+    HomeScreen:
+        name: 'home'
+        manager: 'screen_manager'
+    SettingsScreen:
+        name: 'settings'
+        manager: 'screen_manager'
