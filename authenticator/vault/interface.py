@@ -7,6 +7,10 @@ from sqlalchemy.orm import Session
 from .models import OTP
 
 
+def is_uri_valid(uri: str) -> bool:
+    return OTP.is_uri_valid(uri)
+
+
 def add_otp(uri: str, session: Session) -> OTP:
     otp = OTP(uri=uri)
     session.add(otp)

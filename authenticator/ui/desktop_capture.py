@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
+
+import tempfile
 from typing import Optional
 
 import mss
 from mss.tools import to_png
 from PyQt5 import QtCore, QtWidgets
 
+import vault.interface
+
 
 class DesktopCapture(QtWidgets.QFrame):
+    TOOLBAR_HEIGHT_MARGIN = 15
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setObjectName("root")
@@ -47,6 +53,8 @@ class DesktopCapture(QtWidgets.QFrame):
         return None
 
     def capture(self):
+        from .. import qr_code
+
         main_window = self.get_main_window()
         absolute_coordinates = main_window.pos()
         relative_coordinates = self.capture_zone.pos()
@@ -56,6 +64,9 @@ class DesktopCapture(QtWidgets.QFrame):
             absolute_coordinates.y()
             + relative_coordinates.y()
             + QtWidgets.QStyle.PM_TitleBarHeight
+            # PM_TitleBarHeight is not always accurate (on Linux for instance), add a margin
+            # to make sure we get the entire capture zone
+            + self.TOOLBAR_HEIGHT_MARGIN
         )
         h = self.capture_zone.height()
         w = self.capture_zone.width()
@@ -63,4 +74,10 @@ class DesktopCapture(QtWidgets.QFrame):
         coordinates = {"top": y, "left": x, "width": w, "height": h}
         with mss.mss() as screen_capture:
             img = screen_capture.grab(coordinates)
-        to_png(img.rgb, img.size, output="/tmp/foo.png")
+
+        with tempfile.NamedTemporaryFile(suffix=".png") as f:
+            to_png(img.rgb, img.size, output=f.name)
+            data = qr_code.read(f.name)
+
+        if data and vault.interface.is_uri_valid(data):
+            self.parent().change_screen("add_otp", data)

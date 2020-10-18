@@ -8,7 +8,6 @@ class ScrollableItems(QtWidgets.QScrollArea):
         super().__init__(*args, **kwargs)
         self.setWidget(children)
         self.setWidgetResizable(True)
-        # self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setStyleSheet(
             """

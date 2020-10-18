@@ -14,8 +14,11 @@ class BaseScreen(QtWidgets.QWidget):
         self._app = app
         self.setup()
 
-    def change_screen(self, screen_name: str):
-        self._app.change_screen(screen_name)
+    def change_screen(self, screen_name: str, *args):
+        self._app.change_screen(screen_name, *args)
+
+    def set_args(self, *args):
+        pass
 
 
 class OTPScreen(BaseScreen):
@@ -57,7 +60,7 @@ class AuthenticatorApp:
     def screen(self) -> BaseScreen:
         return self.screens[self._current_screen]
 
-    def change_screen(self, screen_name: str):
+    def change_screen(self, screen_name: str, *args):
         if self.layout.count():
             item = self.layout.takeAt(0)
             widget = item.widget()
@@ -65,6 +68,7 @@ class AuthenticatorApp:
 
         self._current_screen = screen_name
         self.layout.addWidget(self.screen)
+        self.screen.set_args(args)
         if self.screen.transparent:
             self.main_window.setStyleSheet(
                 "background-color: transparent; color: #fff;"

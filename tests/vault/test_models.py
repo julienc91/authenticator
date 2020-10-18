@@ -66,7 +66,6 @@ def test_OTP_properties(issuer, label, digits, interval, algorithm):
         ({}, "884141"),
         ({"interval": 427}, "507832"),
         ({"algorithm": OTPAlgorithms.SHA256}, "373407"),
-        ({"digits": 9}, "939884141"),
     ],
 )
 def test_OTP_generate(patch_time, parameters, expected):

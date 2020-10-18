@@ -7,6 +7,7 @@ from urllib.parse import parse_qsl, ParseResult, unquote, urlparse
 import pyotp
 from pyotp.utils import build_uri
 from sqlalchemy import Column, Integer
+from sqlalchemy.orm import validates
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
     StringEncryptedType,
@@ -56,11 +57,25 @@ class OTP(Base):
             secret, label, initial_count, issuer, algorithm.value, digits, interval
         )
 
+    @classmethod
+    def is_uri_valid(cls, uri: str) -> bool:
+        try:
+            pyotp.parse_uri(uri)
+        except ValueError:
+            return False
+        return True
+
     def __repr__(self):
         return f"<OTP {self.id} - {self.issuer}:{self.label}>"
 
     def __str__(self):
         return f"<OTP {self.issuer}:{self.label}>"
+
+    @validates("uri")
+    def validate_uri(self, _, value):
+        if not self.is_uri_valid(value):
+            raise ValueError("invalid URI")
+        return value
 
     @property
     def _parsed_uri(self) -> ParseResult:
