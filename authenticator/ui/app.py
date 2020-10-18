@@ -2,6 +2,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 
+from .desktop_capture import DesktopCapture
 from .otp import OTPCreateButton, OTPList
 
 
@@ -31,9 +32,9 @@ class DesktopCaptureScreen(BaseScreen):
     transparent = True
 
     def setup(self):
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(QtWidgets.QPushButton("foo"))
-        self.setLayout(layout)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(DesktopCapture())
+        layout.setContentsMargins(0, 0, 0, 0)
 
 
 class AuthenticatorApp:
@@ -43,6 +44,7 @@ class AuthenticatorApp:
 
         self.container = QtWidgets.QWidget()
         self.layout = QtWidgets.QVBoxLayout(self.container)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         self._current_screen = "otp"
         self.screens = {
