@@ -20,9 +20,7 @@ class OTPProgressWidget(QtWidgets.QProgressBar):
 
         self.setStyleSheet(
             """
-            QProgressBar {
-                background-color: #424242;
-            }
+            background-color: #424242;
             QProgresBar::chunk {
                 background-color: #05B8CC;
             }
@@ -148,3 +146,20 @@ class OTPList(QtWidgets.QWidget):
 
         for item in self.get_items():
             self.otp_layout.addWidget(OTPWidget(item))
+
+
+class OTPCreateButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None):
+        super().__init__("+", parent)
+        self.setStyleSheet(
+            """
+            background-color: #05B8CC;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 50px;
+            height: 60px;
+            width: 60px;
+        """
+        )
+
+        self.clicked.connect(lambda: self.parent().change_screen("desktop_capture"))
