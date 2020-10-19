@@ -25,24 +25,40 @@ class DesktopCapture(QtWidgets.QFrame):
         )
 
         texts = [
-            "Move the window above the QRCode to scan.",
+            "Move the window above the QR Code to scan.",
             "Resize the window if necessary.",
         ]
 
         self.capture_zone = QtWidgets.QWidget()
-        button = QtWidgets.QPushButton("Scan")
-        button.clicked.connect(self.capture)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
-        for text in texts:
+
+        def add_label(text=""):
             label = QtWidgets.QLabel(text)
             label.setFixedHeight(25)
             label.setAlignment(QtCore.Qt.AlignCenter)
             layout.addWidget(label)
+            return label
+
+        for t in texts:
+            add_label(t)
+
         layout.addWidget(self.capture_zone)
-        layout.addWidget(button)
+
+        self.error_label = add_label()
+
+        button_layout = QtWidgets.QHBoxLayout()
+
+        cancel_button = QtWidgets.QPushButton("Cancel")
+        cancel_button.clicked.connect(self.cancel)
+        scan_button = QtWidgets.QPushButton("Scan")
+        scan_button.clicked.connect(self.capture)
+
+        button_layout.addWidget(cancel_button)
+        button_layout.addWidget(scan_button)
+        layout.addLayout(button_layout)
 
     @staticmethod
     def get_main_window() -> Optional[QtWidgets.QMainWindow]:
@@ -51,6 +67,9 @@ class DesktopCapture(QtWidgets.QFrame):
             if isinstance(widget, QtWidgets.QMainWindow):
                 return widget
         return None
+
+    def cancel(self):
+        self.parent().change_screen("otp")
 
     def capture(self):
         from .. import qr_code
@@ -79,5 +98,10 @@ class DesktopCapture(QtWidgets.QFrame):
             to_png(img.rgb, img.size, output=f.name)
             data = qr_code.read(f.name)
 
-        if data and vault.interface.is_uri_valid(data):
-            self.parent().change_screen("add_otp", data)
+        if not data:
+            self.error_label.setText("No QR Code detected")
+        elif not vault.interface.is_uri_valid(data):
+            self.error_label.setText("This QR Code is not valid")
+        else:
+            self.error_label.setText("")
+            self.parent().change_screen("add_otp", **{"uri": data})
