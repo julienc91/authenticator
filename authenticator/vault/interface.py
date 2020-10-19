@@ -2,6 +2,7 @@
 
 from typing import List
 
+import pyotp
 from sqlalchemy.orm import Session
 
 from .models import OTP
@@ -9,6 +10,19 @@ from .models import OTP
 
 def is_uri_valid(uri: str) -> bool:
     return OTP.is_uri_valid(uri)
+
+
+def update_otp(otp: OTP, **kwargs):
+    parsed_otp = pyotp.parse_uri(otp.uri)
+    for k, v in kwargs.items():
+        if k == "issuer":
+            parsed_otp.issuer = v
+        elif k == "label":
+            parsed_otp.name = v
+        else:
+            raise KeyError(f"Invalid parameter {k}")
+    uri = parsed_otp.provisioning_uri()
+    otp.uri = uri
 
 
 def add_otp(uri: str, session: Session) -> OTP:

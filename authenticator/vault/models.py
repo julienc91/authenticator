@@ -99,7 +99,7 @@ class OTP(Base):
 
     @property
     def label(self) -> str:
-        return unquote(self._parsed_uri.path.lstrip("/").split(":", 1)[-1]) or None
+        return unquote(self._parsed_uri.path.lstrip("/")).split(":", 1)[-1] or None
 
     @property
     def interval(self) -> int:
