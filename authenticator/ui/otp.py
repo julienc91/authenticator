@@ -5,6 +5,7 @@ from typing import List
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from authenticator.vault import interface
+from authenticator.vault.encryption import EncryptionKeyManager
 from authenticator.vault.models import OTP
 from authenticator.vault.session import SessionMaker
 from authenticator.ui.generic import ScrollableItems
@@ -122,13 +123,20 @@ class OTPList(QtWidgets.QWidget):
         self.otp_layout.setAlignment(QtCore.Qt.AlignTop)
         self.refresh_items()
 
+        top_layout = QtWidgets.QHBoxLayout()
+        lock_button = QtWidgets.QPushButton()
+        lock_button.setIcon(QtGui.QIcon("authenticator/ui/assets/lock.png"))
+        lock_button.pressed.connect(self.lock_vault)
+        top_layout.addWidget(OTPFilter(self))
+        top_layout.addWidget(lock_button)
+
         container = QtWidgets.QWidget()
         container.setLayout(self.otp_layout)
 
         scroll = ScrollableItems(container)
 
         layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(OTPFilter(self))
+        layout.addLayout(top_layout)
         layout.addWidget(scroll)
 
     def get_items(self) -> List[OTP]:
@@ -147,6 +155,10 @@ class OTPList(QtWidgets.QWidget):
 
         for item in self.get_items():
             self.otp_layout.addWidget(OTPWidget(item))
+
+    def lock_vault(self):
+        EncryptionKeyManager().lock()
+        self.parent().change_screen("unlock_vault")
 
 
 class OTPCreateButton(QtWidgets.QPushButton):

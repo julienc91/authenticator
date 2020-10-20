@@ -48,6 +48,12 @@ class UnlockVaultScreen(BaseScreen):
         layout.addWidget(UnlockVaultForm())
         self.setLayout(layout)
 
+    def on_screen_show(self):
+        if not EncryptionKeyManager().is_locked():
+            self.change_screen("otp")
+        else:
+            self._app.main_window.setFixedHeight(self.sizeHint().height())
+
 
 class OTPScreen(BaseScreen):
     def setup(self):
@@ -59,7 +65,7 @@ class OTPScreen(BaseScreen):
         self.setLayout(layout)
 
     def on_screen_show(self):
-        self.setFixedHeight(self.sizeHint().height())
+        self._app.main_window.setFixedHeight(self.sizeHint().height())
 
 
 class DesktopCaptureScreen(BaseScreen):
@@ -120,8 +126,8 @@ class AuthenticatorApp:
 
         self._current_screen_name = screen_name
         self.screen.set_kwargs(**kwargs)
-        self.screen.on_screen_show()
         self.layout.addWidget(self.screen)
+        self.screen.on_screen_show()
         if self.screen.transparent:
             self.main_window.setStyleSheet(
                 "background-color: transparent; color: #fff;"
