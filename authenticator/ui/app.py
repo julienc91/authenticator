@@ -12,10 +12,18 @@ from authenticator.vault.encryption import EncryptionKeyManager
 class BaseScreen(QtWidgets.QWidget):
     transparent = False
 
-    def __init__(self, app, *args, **kwargs):
+    def __init__(self, app: "AuthenticatorApp", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._app = app
         self.kwargs = {}
+
+        if (
+            self.__class__.__name__ != "UnlockVaultScreen"
+            and EncryptionKeyManager().is_locked()
+        ):
+            self.change_screen("unlock_screen")
+            return
+
         self.setup()
 
     def change_screen(self, screen_name: str, **kwargs):
@@ -43,10 +51,6 @@ class UnlockVaultScreen(BaseScreen):
 
 class OTPScreen(BaseScreen):
     def setup(self):
-        if EncryptionKeyManager().is_locked():
-            self.change_screen("unlock_vault")
-            return
-
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(OTPList())
         layout.addWidget(
@@ -90,7 +94,7 @@ class AuthenticatorApp:
         self.layout = QtWidgets.QVBoxLayout(self.container)
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        self._current_screen_name = "otp"
+        self._current_screen_name = "unlock_vault"
         self._current_screen = None
         self.screens = {
             "unlock_vault": lambda: UnlockVaultScreen(self),
