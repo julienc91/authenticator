@@ -2,6 +2,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 
+from authenticator.ui.generic import TitleLabel
 from authenticator.vault.encryption import EncryptionKeyManager, VaultLockedException
 
 
@@ -10,16 +11,25 @@ class UnlockVaultForm(QtWidgets.QWidget):
         super().__init__(*args, **kwargs)
         layout = QtWidgets.QVBoxLayout(self)
 
+        layout.addWidget(TitleLabel("Unlock the vault"))
+
         form_layout = QtWidgets.QFormLayout()
         self.password_field = QtWidgets.QLineEdit()
+        self.password_field.returnPressed.connect(self.try_unlock)
         form_layout.addRow(QtWidgets.QLabel("Password"), self.password_field)
         layout.addLayout(form_layout)
 
         self.error_label = QtWidgets.QLabel()
         self.error_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.error_label.setStyleSheet("color: red;")
         layout.addWidget(self.error_label)
 
         submit_button = QtWidgets.QPushButton("Unlock")
+        submit_button.setStyleSheet(
+            """
+            background-color: #05B8CC; border: 1px solid #000; border-top: 20px solid #000; color: #fff;
+        """
+        )
         submit_button.pressed.connect(self.try_unlock)
         layout.addWidget(submit_button)
 

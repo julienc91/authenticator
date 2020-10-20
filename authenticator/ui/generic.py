@@ -29,3 +29,13 @@ class ScrollableItems(QtWidgets.QScrollArea):
         QtWidgets.QScroller.grabGesture(
             self.viewport(), QtWidgets.QScroller.LeftMouseButtonGesture
         )
+
+
+class TitleLabel(QtWidgets.QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        font = self.font()
+        font.setPixelSize(20)
+        self.setFont(font)
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setContentsMargins(0, 0, 0, 30)

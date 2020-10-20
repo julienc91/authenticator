@@ -2,6 +2,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 
+from authenticator.ui.generic import TitleLabel
 from authenticator.vault import interface
 from authenticator.vault.session import SessionMaker
 
@@ -15,11 +16,7 @@ class AddOtpForm(QtWidgets.QWidget):
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setAlignment(QtCore.Qt.AlignTop)
-        title_label = QtWidgets.QLabel("Add a new code")
-        title_font = title_label.font()
-        title_font.setPixelSize(20)
-        title_label.setFont(title_font)
-        layout.addWidget(title_label)
+        layout.addWidget(TitleLabel("Add a new code"))
 
         form_layout = QtWidgets.QFormLayout()
         self.label_input = QtWidgets.QLineEdit()
