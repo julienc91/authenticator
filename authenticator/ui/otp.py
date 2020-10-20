@@ -5,8 +5,9 @@ from typing import List
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import vault.interface
-from ..vault import OTP, SessionMaker
-from .generic import ScrollableItems
+from authenticator.vault.models import OTP
+from authenticator.vault.session import SessionMaker
+from authenticator.ui.generic import ScrollableItems
 
 
 class OTPProgressWidget(QtWidgets.QProgressBar):

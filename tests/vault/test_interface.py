@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from authenticator.vault import interface, SessionMaker
+from authenticator.vault import interface
+from authenticator.vault.session import SessionMaker
 
 
-def test_add_otp():
+def test_add_otp(unlock_vault):
     session = SessionMaker()
     uri = "otpauth://totp/test%40authenticator?secret=ThisIsTheSecretKey&issuer=authenticator"
     otp = interface.add_otp(uri, session)
@@ -15,7 +16,7 @@ def test_add_otp():
     assert otp.id
 
 
-def test_delete_otp():
+def test_delete_otp(unlock_vault):
     session1 = SessionMaker()
     otp = interface.add_otp("otpauth://totp/?secret=abc", session1)
     session1.commit()

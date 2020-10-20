@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .app import AuthenticatorApp
+from authenticator.ui.app import AuthenticatorApp
 
 __all__ = [AuthenticatorApp]

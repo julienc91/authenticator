@@ -72,7 +72,7 @@ class DesktopCapture(QtWidgets.QFrame):
         self.parent().change_screen("otp")
 
     def capture(self):
-        from .. import qr_code
+        from .. import qr_code  # conflict with qt if imported on top
 
         main_window = self.get_main_window()
         absolute_coordinates = main_window.pos()

@@ -2,9 +2,11 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-from .add_otp import AddOtpForm
-from .desktop_capture import DesktopCapture
-from .otp import OTPCreateButton, OTPList
+from authenticator.ui.add_otp import AddOtpForm
+from authenticator.ui.desktop_capture import DesktopCapture
+from authenticator.ui.otp import OTPCreateButton, OTPList
+from authenticator.ui.unlock_vault import UnlockVaultForm
+from authenticator.vault.encryption import EncryptionKeyManager
 
 
 class BaseScreen(QtWidgets.QWidget):
@@ -32,14 +34,28 @@ class BaseScreen(QtWidgets.QWidget):
         pass
 
 
+class UnlockVaultScreen(BaseScreen):
+    def setup(self):
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(UnlockVaultForm())
+        self.setLayout(layout)
+
+
 class OTPScreen(BaseScreen):
     def setup(self):
+        if EncryptionKeyManager().is_locked():
+            self.change_screen("unlock_vault")
+            return
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(OTPList())
         layout.addWidget(
             OTPCreateButton(), alignment=QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight
         )
         self.setLayout(layout)
+
+    def on_screen_show(self):
+        self.setFixedHeight(self.sizeHint().height())
 
 
 class DesktopCaptureScreen(BaseScreen):
@@ -77,6 +93,7 @@ class AuthenticatorApp:
         self._current_screen_name = "otp"
         self._current_screen = None
         self.screens = {
+            "unlock_vault": lambda: UnlockVaultScreen(self),
             "otp": lambda: OTPScreen(self),
             "desktop_capture": lambda: DesktopCaptureScreen(self),
             "add_otp": lambda: AddOtpScreen(self),

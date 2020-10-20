@@ -3,7 +3,7 @@
 from PyQt5 import QtCore, QtWidgets
 
 import vault.interface
-from ..vault import SessionMaker
+from ..vault.session import SessionMaker
 
 
 class AddOtpForm(QtWidgets.QWidget):

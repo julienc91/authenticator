@@ -6,15 +6,19 @@ from urllib.parse import parse_qsl, ParseResult, unquote, urlparse
 
 import pyotp
 from pyotp.utils import build_uri
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import validates
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
     StringEncryptedType,
 )
 
-from .database import Base
-from .encryption import get_encryption_key
+from authenticator.vault.database import Base
+from authenticator.vault.encryption import EncryptionKeyManager
+
+
+def get_encryption_key() -> str:
+    return EncryptionKeyManager().get_key()
 
 
 class OTPTypes(Enum):
@@ -132,3 +136,13 @@ class OTP(Base):
         timestamp = time.time()
         interval = self.interval
         return interval - (timestamp % interval)
+
+
+class Config(Base):
+    __tablename__ = "config"
+
+    id = Column(Integer, primary_key=True)
+    encrypted_check = Column(
+        StringEncryptedType(key=get_encryption_key, engine=AesEngine, padding="pkcs5")
+    )
+    clear_check = Column(String)

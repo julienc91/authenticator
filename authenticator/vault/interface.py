@@ -5,7 +5,7 @@ from typing import List
 import pyotp
 from sqlalchemy.orm import Session
 
-from .models import OTP
+from authenticator.vault.models import OTP
 
 
 def is_uri_valid(uri: str) -> bool:
