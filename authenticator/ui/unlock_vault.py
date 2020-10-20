@@ -2,7 +2,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-from ..vault.encryption import EncryptionKeyManager, VaultLockedException
+from authenticator.vault.encryption import EncryptionKeyManager, VaultLockedException
 
 
 class UnlockVaultForm(QtWidgets.QWidget):

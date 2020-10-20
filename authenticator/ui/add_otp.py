@@ -2,8 +2,8 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-import vault.interface
-from ..vault.session import SessionMaker
+from authenticator.vault import interface
+from authenticator.vault.session import SessionMaker
 
 
 class AddOtpForm(QtWidgets.QWidget):
@@ -50,7 +50,7 @@ class AddOtpForm(QtWidgets.QWidget):
 
     def set_uri(self, uri):
         self.session = SessionMaker()
-        self._otp = vault.interface.add_otp(uri, self.session)
+        self._otp = interface.add_otp(uri, self.session)
         self.refresh()
 
     def refresh(self):
@@ -58,10 +58,10 @@ class AddOtpForm(QtWidgets.QWidget):
         self.issuer_input.setText(self._otp.issuer)
 
     def update_label(self, value):
-        vault.interface.update_otp(self._otp, label=value)
+        interface.update_otp(self._otp, label=value)
 
     def update_issuer(self, value):
-        vault.interface.update_otp(self._otp, issuer=value)
+        interface.update_otp(self._otp, issuer=value)
 
     def cancel(self):
         self.session.rollback()

@@ -4,7 +4,7 @@ from typing import List
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import vault.interface
+from authenticator.vault import interface
 from authenticator.vault.models import OTP
 from authenticator.vault.session import SessionMaker
 from authenticator.ui.generic import ScrollableItems
@@ -133,7 +133,7 @@ class OTPList(QtWidgets.QWidget):
 
     def get_items(self) -> List[OTP]:
         session = SessionMaker()
-        return vault.interface.get_all_otp(session, search=self.search_text)
+        return interface.get_all_otp(session, search=self.search_text)
 
     def update_search(self, search):
         self.search_text = search

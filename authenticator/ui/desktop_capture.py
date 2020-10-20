@@ -7,7 +7,7 @@ import mss
 from mss.tools import to_png
 from PyQt5 import QtCore, QtWidgets
 
-import vault.interface
+from authenticator.vault import interface
 
 
 class DesktopCapture(QtWidgets.QFrame):
@@ -72,7 +72,7 @@ class DesktopCapture(QtWidgets.QFrame):
         self.parent().change_screen("otp")
 
     def capture(self):
-        from .. import qr_code  # conflict with qt if imported on top
+        from authenticator import qr_code  # conflict with qt if imported on top
 
         main_window = self.get_main_window()
         absolute_coordinates = main_window.pos()
@@ -100,7 +100,7 @@ class DesktopCapture(QtWidgets.QFrame):
 
         if not data:
             self.error_label.setText("No QR Code detected")
-        elif not vault.interface.is_uri_valid(data):
+        elif not interface.is_uri_valid(data):
             self.error_label.setText("This QR Code is not valid")
         else:
             self.error_label.setText("")
