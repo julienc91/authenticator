@@ -2,6 +2,8 @@
 
 import uuid
 
+import keyring
+import keyring.errors
 from sqlalchemy_utils.types.encrypted.padding import InvalidPaddingError
 
 from authenticator.vault.session import SessionMaker
@@ -9,24 +11,61 @@ from authenticator.vault.utils import SingletonMetaClass
 
 
 class EncryptionKeyManager(metaclass=SingletonMetaClass):
+    __keyring_namespace = "julienc91/authenticator"
+    __keyring_username = "authenticator"
     __key = None
 
-    def unlock(self, key: str):
+    def unlock(self, key: str, remember: bool = False):
         self.__key = key
         if not self.__check_key():
             self.__key = None
             raise VaultLockedException
+        if remember:
+            self.__remember_key()
+        else:
+            self.__forget_key()
 
     def lock(self):
+        self.__forget_key()
         self.__key = None
 
     def is_locked(self) -> bool:
+        if self.__key:
+            return False
+
+        self.__key = self.__get_remembered_key()
+        if not self.__check_key():
+            self.__key = None
+
         return not self.__key
+
+    def __get_remembered_key(self) -> str:
+        try:
+            return keyring.get_password(
+                self.__keyring_namespace, self.__keyring_username
+            )
+        except keyring.errors.KeyringError:
+            pass
+
+    def __remember_key(self):
+        if self.__key:
+            try:
+                keyring.set_password(
+                    self.__keyring_namespace, self.__keyring_username, self.__key
+                )
+            except keyring.errors.KeyringError:
+                pass
+
+    def __forget_key(self):
+        try:
+            keyring.delete_password(self.__keyring_namespace, self.__keyring_username)
+        except keyring.errors.KeyringError:
+            pass
 
     def __check_key(self) -> bool:
         from authenticator.vault.models import Config
 
-        if self.is_locked():
+        if not self.__key:
             return False
 
         session = SessionMaker()
@@ -50,7 +89,7 @@ class EncryptionKeyManager(metaclass=SingletonMetaClass):
         return True
 
     def get_key(self) -> str:
-        if not self.__key:
+        if self.is_locked():
             raise VaultLockedException
         return self.__key
 

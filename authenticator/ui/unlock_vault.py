@@ -17,6 +17,8 @@ class UnlockVaultForm(QtWidgets.QWidget):
         self.password_field = QtWidgets.QLineEdit()
         self.password_field.returnPressed.connect(self.try_unlock)
         form_layout.addRow(QtWidgets.QLabel("Password"), self.password_field)
+        self.remember_checkbox = QtWidgets.QCheckBox("Remember")
+        form_layout.addRow(self.remember_checkbox)
         layout.addLayout(form_layout)
 
         self.error_label = QtWidgets.QLabel()
@@ -35,8 +37,9 @@ class UnlockVaultForm(QtWidgets.QWidget):
 
     def try_unlock(self):
         key = self.password_field.text()
+        remember = self.remember_checkbox.isChecked()
         try:
-            EncryptionKeyManager().unlock(key)
+            EncryptionKeyManager().unlock(key, remember=remember)
         except VaultLockedException:
             self.error_label.setText("Invalid password")
         else:
