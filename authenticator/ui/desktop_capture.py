@@ -74,6 +74,8 @@ class DesktopCapture(QtWidgets.QFrame):
     def capture(self):
         from authenticator import qr_code  # conflict with qt if imported on top
 
+        self.error_label.setText("")
+
         main_window = self.get_main_window()
         absolute_coordinates = main_window.pos()
         relative_coordinates = self.capture_zone.pos()
