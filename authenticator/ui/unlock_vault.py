@@ -15,6 +15,7 @@ class UnlockVaultForm(QtWidgets.QWidget):
 
         form_layout = QtWidgets.QFormLayout()
         self.password_field = QtWidgets.QLineEdit()
+        self.password_field.setEchoMode(QtWidgets.QLineEdit.Password)
         self.password_field.returnPressed.connect(self.try_unlock)
         form_layout.addRow(QtWidgets.QLabel("Password"), self.password_field)
         self.remember_checkbox = QtWidgets.QCheckBox("Remember")
