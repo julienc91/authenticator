@@ -7,6 +7,7 @@ import mss
 from mss.tools import to_png
 from PyQt5 import QtCore, QtWidgets
 
+from authenticator.ui.generic import BlueButton, ErrorLabel
 from authenticator.vault import interface
 
 
@@ -15,12 +16,10 @@ class DesktopCapture(QtWidgets.QFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setObjectName("root")
         self.setStyleSheet(
             """
             QFrame { border: 20px solid #000; }
             QLabel { background-color: #000; color: #fff; }
-            QPushButton { background-color: #05B8CC; border: 1px solid #000; border-top: 20px solid #000; color: #fff; }
         """
         )
 
@@ -47,13 +46,14 @@ class DesktopCapture(QtWidgets.QFrame):
 
         layout.addWidget(self.capture_zone)
 
-        self.error_label = add_label()
+        self.error_label = ErrorLabel()
+        layout.addWidget(self.error_label)
 
         button_layout = QtWidgets.QHBoxLayout()
 
-        cancel_button = QtWidgets.QPushButton("Cancel")
+        cancel_button = BlueButton("Cancel")
         cancel_button.clicked.connect(self.cancel)
-        scan_button = QtWidgets.QPushButton("Scan")
+        scan_button = BlueButton("Scan")
         scan_button.clicked.connect(self.capture)
 
         button_layout.addWidget(cancel_button)

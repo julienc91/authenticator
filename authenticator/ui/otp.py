@@ -8,7 +8,7 @@ from authenticator.vault import interface
 from authenticator.vault.encryption import EncryptionKeyManager
 from authenticator.vault.models import OTP
 from authenticator.vault.session import SessionMaker
-from authenticator.ui.generic import ScrollableItems
+from authenticator.ui.generic import ScrollableItems, TextInput
 
 
 class OTPProgressWidget(QtWidgets.QProgressBar):
@@ -22,9 +22,12 @@ class OTPProgressWidget(QtWidgets.QProgressBar):
 
         self.setStyleSheet(
             """
-            background-color: #424242;
-            QProgresBar::chunk {
+            QProgressBar {
+                background-color: #424242;
+            }
+            QProgressBar::chunk {
                 background-color: #05B8CC;
+                border-radius: 2px;
             }
         """
         )
@@ -43,24 +46,6 @@ class OTPProgressWidget(QtWidgets.QProgressBar):
     def update_progress(self):
         self.setValue(self._progress)
         self.repaint()
-
-
-class OTPFilter(QtWidgets.QLineEdit):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        search_icon = QtGui.QIcon("authenticator/ui/assets/search.png")
-        self.addAction(search_icon, QtWidgets.QLineEdit.LeadingPosition)
-        self.textChanged.connect(self.parent().update_search)
-
-        self.setStyleSheet(
-            """
-            QLineEdit {
-                background-color: #fff;
-                color: #000;
-            }
-        """
-        )
 
 
 class OTPWidget(QtWidgets.QWidget):
@@ -127,7 +112,9 @@ class OTPList(QtWidgets.QWidget):
         lock_button = QtWidgets.QPushButton()
         lock_button.setIcon(QtGui.QIcon("authenticator/ui/assets/lock.png"))
         lock_button.pressed.connect(self.lock_vault)
-        top_layout.addWidget(OTPFilter(self))
+        filter_input = TextInput(icon="authenticator/ui/assets/search.png")
+        filter_input.textChanged.connect(self.update_search)
+        top_layout.addWidget(filter_input)
         top_layout.addWidget(lock_button)
 
         container = QtWidgets.QWidget()
@@ -169,8 +156,10 @@ class OTPCreateButton(QtWidgets.QPushButton):
             background-color: #05B8CC;
             border-radius: 30px;
             color: #fff;
-            font-size: 50px;
-            height: 60px;
+            font-size: 60px;
+            height: 55px;
+            padding-bottom: 5px;
+            text-align: center;
             width: 60px;
         """
         )

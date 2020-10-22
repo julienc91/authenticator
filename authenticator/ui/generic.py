@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class ScrollableItems(QtWidgets.QScrollArea):
@@ -39,3 +39,48 @@ class TitleLabel(QtWidgets.QLabel):
         self.setFont(font)
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setContentsMargins(0, 0, 0, 30)
+
+
+class BlueButton(QtWidgets.QPushButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setStyleSheet(
+            "background-color: #05B8CC; border: 1px solid #000; border-top: 20px solid #000; color: #fff;"
+        )
+
+
+class TextInput(QtWidgets.QLineEdit):
+    def __init__(self, *args, **kwargs):
+        is_password = kwargs.pop("password", False)
+        icon = kwargs.pop("icon", None)
+        super().__init__(*args, **kwargs)
+
+        if is_password:
+            self.setEchoMode(self.Password)
+
+        if icon:
+            icon = QtGui.QIcon(icon)
+            self.addAction(icon, self.LeadingPosition)
+
+        self.setStyleSheet(
+            "background-color: #fff; border: 1px solid #05B8CC; color: #000;"
+        )
+
+
+class ErrorLabel(QtWidgets.QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setStyleSheet("color: #f00;")
+        self.setFixedHeight(self.minimumSizeHint().height())
+
+
+class CheckBox(QtWidgets.QCheckBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setStyleSheet(
+            """
+            QCheckBox::indicator:checked { background-color: #05B8CC; border: 1px solid #fff; color: #000; }
+            QCheckBox::indicator:unchecked { background-color: #000; border: 1px solid #fff; color: #fff; }
+        """
+        )
