@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 from authenticator.ui.add_otp import AddOtpForm
 from authenticator.ui.desktop_capture import DesktopCapture
 from authenticator.ui.otp import OTPCreateButton, OTPList
+from authenticator.ui.setup_vault import SetupVaultForm
 from authenticator.ui.unlock_vault import UnlockVaultForm
 from authenticator.vault.encryption import EncryptionKeyManager
 
@@ -18,10 +19,10 @@ class BaseScreen(QtWidgets.QWidget):
         self.kwargs = {}
 
         if (
-            self.__class__.__name__ != "UnlockVaultScreen"
+            self.__class__.__name__ not in ["UnlockVaultScreen", "SetupVaultScreen"]
             and EncryptionKeyManager().is_locked()
         ):
-            self.change_screen("unlock_screen")
+            self.change_screen("unlock_vault")
             return
 
         self.setup()
@@ -42,6 +43,16 @@ class BaseScreen(QtWidgets.QWidget):
         pass
 
 
+class SetupVaultScreen(BaseScreen):
+    def setup(self):
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(SetupVaultForm())
+        self.setLayout(layout)
+
+    def on_screen_show(self):
+        self._app.main_window.resize(self.sizeHint().width(), self.sizeHint().height())
+
+
 class UnlockVaultScreen(BaseScreen):
     def setup(self):
         layout = QtWidgets.QVBoxLayout()
@@ -52,7 +63,9 @@ class UnlockVaultScreen(BaseScreen):
         if not EncryptionKeyManager().is_locked():
             self.change_screen("otp")
         else:
-            self._app.main_window.setFixedHeight(self.sizeHint().height())
+            self._app.main_window.resize(
+                self.sizeHint().width(), self.sizeHint().height()
+            )
 
 
 class OTPScreen(BaseScreen):
@@ -65,7 +78,7 @@ class OTPScreen(BaseScreen):
         self.setLayout(layout)
 
     def on_screen_show(self):
-        self._app.main_window.setFixedHeight(self.sizeHint().height())
+        self._app.main_window.resize(self.sizeHint().width(), 600)
 
 
 class DesktopCaptureScreen(BaseScreen):
@@ -100,9 +113,12 @@ class AuthenticatorApp:
         self.layout = QtWidgets.QVBoxLayout(self.container)
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        self._current_screen_name = "unlock_vault"
+        self._current_screen_name = (
+            "setup_vault" if EncryptionKeyManager.is_setup() else "unlock_vault"
+        )
         self._current_screen = None
         self.screens = {
+            "setup_vault": lambda: SetupVaultScreen(self),
             "unlock_vault": lambda: UnlockVaultScreen(self),
             "otp": lambda: OTPScreen(self),
             "desktop_capture": lambda: DesktopCaptureScreen(self),
@@ -138,6 +154,7 @@ class AuthenticatorApp:
     def run(self):
         self.main_window.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.main_window.setMinimumWidth(380)
+        self.main_window.setMinimumHeight(200)
         self.change_screen(self._current_screen_name)
         self.main_window.show()
         self.app.exec_()

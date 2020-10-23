@@ -29,6 +29,13 @@ class EncryptionKeyManager(metaclass=SingletonMetaClass):
         self.__forget_key()
         self.__key = None
 
+    @staticmethod
+    def is_setup() -> bool:
+        from authenticator.vault.models import Config
+
+        session = SessionMaker()
+        return not session.query(Config).count()
+
     def is_locked(self) -> bool:
         if self.__key:
             return False
