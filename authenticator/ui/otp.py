@@ -95,7 +95,7 @@ class OTPWidget(QtWidgets.QWidget):
     def update_code_label(self):
         self.code_label.setText(self._code)
         QtCore.QTimer.singleShot(
-            self.otp.get_next_change_timeout(), self.update_code_label
+            self.otp.get_next_change_timeout() * 1000, self.update_code_label
         )
 
 

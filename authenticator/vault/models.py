@@ -2,11 +2,13 @@
 
 import time
 from enum import Enum
+from functools import cached_property
 from urllib.parse import parse_qsl, ParseResult, unquote, urlparse
 
 import pyotp
 from pyotp.utils import build_uri
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.event import listens_for
 from sqlalchemy.orm import validates
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
@@ -43,6 +45,24 @@ class OTP(Base):
     uri = Column(
         StringEncryptedType(key=get_encryption_key, engine=AesEngine, padding="pkcs5")
     )
+
+    def reset_cache(self):
+        cached_properties = [
+            "_parsed_uri",
+            "_parsed_parameters",
+            "__secret",
+            "type",
+            "issuer",
+            "label",
+            "interval",
+            "algorithm",
+            "digits",
+        ]
+        for name in cached_properties:
+            try:
+                delattr(self, name)
+            except AttributeError:
+                pass
 
     @classmethod
     def create_uri(
@@ -81,42 +101,42 @@ class OTP(Base):
             raise ValueError("invalid URI")
         return value
 
-    @property
+    @cached_property
     def _parsed_uri(self) -> ParseResult:
         return urlparse(self.uri)
 
-    @property
+    @cached_property
     def _parsed_parameters(self) -> dict:
         return dict(parse_qsl(self._parsed_uri.query))
 
-    @property
+    @cached_property
     def __secret(self) -> str:
         return self._parsed_parameters["secret"]
 
-    @property
+    @cached_property
     def type(self) -> OTPTypes:
         return OTPTypes(self._parsed_uri.netloc)
 
-    @property
+    @cached_property
     def issuer(self) -> str:
         return self._parsed_parameters.get("issuer") or None
 
-    @property
+    @cached_property
     def label(self) -> str:
         return unquote(self._parsed_uri.path.lstrip("/")).split(":", 1)[-1] or None
 
-    @property
+    @cached_property
     def interval(self) -> int:
         return int(self._parsed_parameters.get("period") or DEFAULT_INTERVAL)
 
-    @property
+    @cached_property
     def algorithm(self) -> OTPAlgorithms:
         try:
             return OTPAlgorithms[self._parsed_parameters["algorithm"]]
         except KeyError:
             return DEFAULT_ALGORITHM
 
-    @property
+    @cached_property
     def digits(self) -> int:
         return int(self._parsed_parameters.get("digits") or DEFAULT_DIGITS)
 
@@ -136,6 +156,11 @@ class OTP(Base):
         timestamp = time.time()
         interval = self.interval
         return interval - (timestamp % interval)
+
+
+@listens_for(OTP, "after_update")
+def otp_after_update(mapper, connection, target: OTP):
+    target.reset_cache()
 
 
 class Config(Base):
