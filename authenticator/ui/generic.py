@@ -26,7 +26,8 @@ class ScrollableItems(QtWidgets.QScrollArea):
             }
         """
         )
-        QtWidgets.QScroller.grabGesture(
+        scroller = QtWidgets.QScroller.scroller(self.viewport())
+        scroller.grabGesture(
             self.viewport(), QtWidgets.QScroller.LeftMouseButtonGesture
         )
 

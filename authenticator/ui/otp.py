@@ -120,7 +120,9 @@ class OTPList(QtWidgets.QWidget):
         container = QtWidgets.QWidget()
         container.setLayout(self.otp_layout)
 
-        scroll = ScrollableItems(container)
+        scroll = ScrollableItems(container, self)
+        self.setFixedWidth(420)
+        scroll.setFixedWidth(400)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.addLayout(top_layout)

@@ -70,15 +70,21 @@ class UnlockVaultScreen(BaseScreen):
 
 class OTPScreen(BaseScreen):
     def setup(self):
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(OTPList())
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(OTPList(self))
         layout.addWidget(
             OTPCreateButton(), alignment=QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight
         )
-        self.setLayout(layout)
 
     def on_screen_show(self):
         self._app.main_window.resize(self.sizeHint().width(), 600)
+        self._app.main_window.setFixedWidth(440)
+
+    def on_screen_close(self):
+        ...
+        self._app.main_window.setMaximumWidth(
+            self._app.main_window.screen().size().width()
+        )
 
 
 class DesktopCaptureScreen(BaseScreen):
@@ -153,7 +159,6 @@ class AuthenticatorApp:
 
     def run(self):
         self.main_window.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.main_window.setMinimumWidth(380)
         self.main_window.setMinimumHeight(200)
         self.change_screen(self._current_screen_name)
         self.main_window.show()
