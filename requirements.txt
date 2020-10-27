@@ -5,6 +5,7 @@ mss              == 6.0.0
 opencv-python    == 4.4.0.44
 pillow           == 8.0.1
 pyotp            == 2.4.1
+pyperclip        == 1.8.1
 PyQt5            == 5.15.1
 qrcode           == 6.1
 sqlalchemy       == 1.3.20

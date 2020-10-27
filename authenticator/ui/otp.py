@@ -2,6 +2,7 @@
 
 from typing import List
 
+import pyperclip
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from authenticator.vault import interface
@@ -48,10 +49,21 @@ class OTPProgressWidget(QtWidgets.QProgressBar):
         self.repaint()
 
 
+class CopyButton(QtWidgets.QPushButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFixedWidth(50)
+        self.setIcon(QtGui.QIcon("authenticator/ui/assets/copy.png"))
+        self.setStyleSheet("border: none;")
+
+
 class OTPWidget(QtWidgets.QWidget):
     def __init__(self, otp, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.otp = otp
+        self.hover_timer = QtCore.QTimer(self)
+        self.hover_timer.setInterval(200)
+        self.hover_timer.setSingleShot(True)
 
         issuer_label = QtWidgets.QLabel(self._issuer)
         main_layout = QtWidgets.QVBoxLayout()
@@ -66,6 +78,11 @@ class OTPWidget(QtWidgets.QWidget):
         code_label = QtWidgets.QLabel(self._code)
         code_label.setFont(QtGui.QFont("Monospace", 30, QtGui.QFont.Monospace))
         container_layout.addWidget(code_label)
+
+        self.copy_button = CopyButton()
+        self.copy_button.hide()
+        self.copy_button.pressed.connect(self.copy_code)
+        container_layout.addWidget(self.copy_button)
         container.setLayout(container_layout)
 
         main_layout.addWidget(container)
@@ -97,6 +114,19 @@ class OTPWidget(QtWidgets.QWidget):
         QtCore.QTimer.singleShot(
             self.otp.get_next_change_timeout() * 1000, self.update_code_label
         )
+
+    def copy_code(self):
+        pyperclip.copy(self._code)
+        self.copy_button.hide()
+
+    def enterEvent(self, _):
+        self.hover_timer.start()
+        self.hover_timer.timeout.connect(lambda: self.copy_button.show())
+
+    def leaveEvent(self, _):
+        if self.hover_timer:
+            self.hover_timer.stop()
+        self.copy_button.hide()
 
 
 class OTPList(QtWidgets.QWidget):
