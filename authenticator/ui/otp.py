@@ -52,8 +52,16 @@ class OTPProgressWidget(QtWidgets.QProgressBar):
 class CopyButton(QtWidgets.QPushButton):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setFixedWidth(50)
+        self.setFixedWidth(30)
         self.setIcon(QtGui.QIcon("authenticator/ui/assets/copy.png"))
+        self.setStyleSheet("border: none;")
+
+
+class EditButton(QtWidgets.QPushButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFixedWidth(30)
+        self.setIcon(QtGui.QIcon("authenticator/ui/assets/edit.png"))
         self.setStyleSheet("border: none;")
 
 
@@ -83,6 +91,12 @@ class OTPWidget(QtWidgets.QWidget):
         self.copy_button.hide()
         self.copy_button.pressed.connect(self.copy_code)
         container_layout.addWidget(self.copy_button)
+
+        self.edit_button = EditButton()
+        self.edit_button.hide()
+        self.edit_button.pressed.connect(self.enter_edit_mode)
+        container_layout.addWidget(self.edit_button)
+
         container.setLayout(container_layout)
 
         main_layout.addWidget(container)
@@ -121,12 +135,23 @@ class OTPWidget(QtWidgets.QWidget):
 
     def enterEvent(self, _):
         self.hover_timer.start()
-        self.hover_timer.timeout.connect(lambda: self.copy_button.show())
+        self.hover_timer.timeout.connect(lambda: self.toggle_buttons(True))
+
+    def toggle_buttons(self, show: bool):
+        if show:
+            self.copy_button.show()
+            self.edit_button.show()
+        else:
+            self.copy_button.hide()
+            self.edit_button.hide()
 
     def leaveEvent(self, _):
         if self.hover_timer:
             self.hover_timer.stop()
-        self.copy_button.hide()
+        self.toggle_buttons(False)
+
+    def enter_edit_mode(self):
+        pass
 
 
 class OTPList(QtWidgets.QWidget):
